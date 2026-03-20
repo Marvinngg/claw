@@ -1,220 +1,165 @@
 # Claw
 
-**A self-evolving cognitive system, not a chatbot.**
-
-Claw is a living cognitive architecture built on [Claude Code](https://claude.ai/claude-code) and the [Claude Agent SDK](https://github.com/anthropics/claude-agent-sdk). It doesn't just respond to prompts — it learns from RSS feeds, reflects on its own performance, evolves its knowledge through compression, and builds its own tools when existing ones aren't good enough.
+**AI that grows, not just responds.**
 
 Most AI agent frameworks ask: *"How do I orchestrate LLM calls?"*
-Claw asks: **"How does an AI system grow?"**
+Claw asks a different question: **"How does an AI system grow?"**
+
+Claw is a self-evolving cognitive architecture built on [Claude Code](https://claude.ai/claude-code) and the [Claude Agent SDK](https://github.com/anthropics/claude-agent-sdk). It learns from 97 RSS sources, reflects on its own performance, compresses knowledge into irreducible structures, and builds its own tools when existing ones aren't good enough — all autonomously.
 
 ---
 
-## Core Philosophy
+## Design Philosophy
 
-### Intelligence = Compression, Not Accumulation
+### Evolution = Compression
 
-Every piece of knowledge Claw acquires must earn its place. Skills don't grow by appending — they evolve by compressing. When SKILL.md hits its 5000-character limit, new knowledge must displace old knowledge. Information density monotonically increases.
+Every piece of knowledge must earn its place. Skills don't grow by appending — they evolve by compressing. When a skill hits its size limit, new knowledge must displace old. Information density monotonically increases.
 
-This mirrors how human expertise works: a master chess player doesn't remember more positions — they see fewer, more powerful patterns.
+A master chess player doesn't remember more positions — they see fewer, more powerful patterns. Claw works the same way.
 
 ### Rank Reduction (降秩)
 
-Borrowed from linear algebra: find the minimum set of independent generators that can reconstruct all observed behaviors in a domain. Remove redundancy. What remains is the irreducible cognitive structure.
+From linear algebra: find the minimum set of independent generators that reconstruct all behaviors in a domain. What remains after removing redundancy is the irreducible cognitive structure — the "rank".
 
-Every skill in Claw is defined by its "rank" — the minimum number of independent thinking operations needed to cover the domain. A stock investment skill has rank 3: Market Context Reading × Signal Synthesis × Cognitive Gatekeeping. Remove any one and the system degrades.
+Example: the included A-stock investment skill has rank 3:
+- **G1** Market Context × **G2** Signal Synthesis × **G3** Cognitive Gatekeeping
 
-### Autonomy Through Constraints
+Remove G3 (the soul generator) and it degrades from an independent thinker to a generic stock screener that can't resist crowd emotion.
 
-Claw doesn't use orchestration loops ("first do A, then do B"). Instead, it uses constraint declarations ("must not exceed X", "can use tools Y"). The LLM decides execution order. Orchestration is a ceiling (limits capability); constraints are a floor (enables emergence).
+### Constraints Over Orchestration
+
+No "first do A, then do B". Only "must not exceed X" and "can use tools Y". The LLM decides execution order. Orchestration is a ceiling; constraints are a floor.
 
 ---
 
-## Architecture
+## Four Evolution Paths
+
+Claw evolves along four independent paths simultaneously:
 
 ```
-                    External World
-                 /                \
-       RSS Feeds                  Conversations
-       (97 sources)               (Telegram)
-            |                         |
-            v                         v
-  +-------------------+    +-------------------+
-  | Feed Pipeline     |    | Daily Dialogue    |
-  | Stage 1: Fetch    |    | CAS opus          |
-  | Stage 2: Filter   |    | Full tool access  |
-  | Stage 3: Learn    |    +-------------------+
-  +-------------------+              |
-            |                         |
-            v                         v
-  +------------------------------------------------+
-  |              SKILL.md (Domain Knowledge)         |
-  |  Wiring diagram + core knowledge  <=5000 chars   |
-  |  Auto-loaded when triggered                      |
-  +------------------------+-----------------------+
-                           |
-       +-------------------+-------------------+
-       |                   |                   |
-       v                   v                   v
-  tools.py           evolution-log.md     worldview.md
-  (Domain Tools)     (Reflection Buffer)  (Cross-domain)
-  <=3000 chars       [反思] [知识]         <=80 lines
-  <=5 tools          [工具需求] [工具反思]
-       |                   |                   |
-       +-------------------+-------------------+
-                           |
-                      Heartbeat
-                    (every 6 hours)
-                           |
-              +------------+------------+
-              |            |            |
-              v            v            v
-         Skill          Tool        Worldview
-         Maintenance    Maintenance  Maintenance
-         (compress)     (evolve)    (promote to
-                                    CLAUDE.md)
+Domain Learning       ── how to think about a field ──→  SKILL.md
+  RSS articles, conversations → [反思]/[知识] → heartbeat compresses back
+  Priority: metacognition > rules > data
+
+Tool Evolution        ── what instruments to use ────→  tools.py
+  Usage → tool breaks or data quality insufficient → [工具反思]
+  Agent fixes immediately, or heartbeat crystallizes systematically
+  Trigger: output quality, not frequency
+
+General Knowledge     ── how to see the world ──────→  CLAUDE.md
+  Cross-domain insights → worldview.md → heartbeat validates (≥2 sources)
+  Promoted to the "soul" — loaded into every conversation
+
+Collaboration         ── how to work with humans ──→  memory/
+  CC auto memory system, AI judges autonomously
+  User preferences, behavioral corrections, project context
 ```
 
-### Four Evolution Paths
-
-| Path | What Evolves | Mechanism | Destination |
-|------|-------------|-----------|-------------|
-| **Domain Learning** | How to think about a field | RSS/conversations → evolution-log → heartbeat folds back | SKILL.md |
-| **Tool Evolution** | What instruments to use | Usage → [工具反思] → agent fixes or heartbeat crystallizes | tools.py |
-| **General Knowledge** | How to see the world | Cross-domain insights → heartbeat validates (>=2 sources) | CLAUDE.md |
-| **Collaboration** | How to work with humans | CC auto memory, AI judges autonomously | memory/ |
-
-### Dual Memory Architecture
-
-```
-Cognitive Memory (claw/)              Collaborative Memory (memory/)
-  SKILL.md, tools.py,                  CC auto memory system
-  worldview.md, evolution-log.md        User preferences, feedback,
-  Maintained by heartbeat               project context
-
-  Delete it → knowledge degrades        Delete it → collaboration degrades
-
-  Derivable from code → don't store
-```
+Each path has its own destination, its own lifecycle, its own compression logic. They don't interfere — a tool reflection doesn't pollute domain knowledge, a collaboration preference doesn't dilute expertise.
 
 ---
 
 ## The Heartbeat
 
-Every 6 hours, Claw performs autonomous self-maintenance:
+Every 6 hours, Claw wakes up and maintains itself:
 
-**Phase 1 — Diagnosis (haiku, read-only)**
-- Scans all evolution logs for unprocessed entries
-- Checks SKILL.md size limits
-- Checks tools.py health (size, count, import whitelist)
-- Checks worldview.md line count
-- Reports: skip or run + task list
+**Phase 1 — Diagnosis** (haiku, read-only)
+- Scans evolution logs for unprocessed `[反思]` `[知识]` `[工具需求]` `[工具反思]`
+- Checks SKILL.md / tools.py size limits
+- Detects systemic issues (≥3 similar reflections on same topic)
+- Decides: skip or run
 
-**Phase 2 — Execution (opus)**
-- `skill_maintenance`: Compresses reflections into SKILL.md. Priority: metacognition > rules > data
-- `tool_maintenance`: Reads methodology, then crystallizes/optimizes/deprecates tools
-- `worldview_maintenance`: Promotes validated insights to CLAUDE.md (the "soul")
+**Phase 2 — Execution** (opus)
+- `skill_maintenance` — compress reflections into SKILL.md, delete to make room for new
+- `tool_maintenance` — read methodology, then crystallize / optimize / deprecate tools
+- `worldview_maintenance` — promote validated cross-domain insights to CLAUDE.md
+
+**RSS Learning** (independent of Phase 1/2)
+- Stage 1: Python fetches 97 sources, zero LLM cost
+- Stage 2: Sonnet filters — methodology and architecture over news and releases
+- Stage 3: Opus deep-reads, updates skills and worldview
 
 ---
 
 ## Tool Evolution
 
-Tools aren't pre-designed — they grow from practice.
+Tools aren't designed upfront — they grow from practice.
 
-**Creation trigger**: Not frequency, but quality. If CC's native tools (Bash, WebFetch) can't achieve the output quality a skill demands, a tool gets built. A stock analysis skill needs first-hand market data, not third-hand web scrapes.
+**When to build**: Not "I've used Bash 3 times for this" but "Bash can't get first-hand data quality for this skill". A stock agent needs live market APIs, not third-hand web scrapes.
 
-**Methodology**: Before creating or modifying any tool, the agent must read `tool-methodology.md` — 7 principles distilled from Anthropic's ACI guidelines, Block's MCP Playbook, and academic research on 856+ tool descriptions.
+**How to build**: Before creating or modifying any tool, the agent reads `tool-methodology.md` — 7 principles from Anthropic's ACI guidelines, Block's MCP Playbook, and research on 856+ tool descriptions:
+
+1. Design for outcomes, not API wrappers
+2. Less is more (≤5 tools per skill)
+3. Flat parameters + enum constraints (poka-yoke)
+4. Semantic return values for AI consumption
+5. Error messages teach, not just report
+6. Descriptions like explaining to a new colleague
+7. Multi-step operations → code execution, not tool chaining
 
 **Lifecycle**:
 ```
-Need discovered → Read methodology → Write tools.py
-                                         |
-  Next message: tool_loader auto-discovers, registers as MCP
-                                         |
-  Usage → works fine → no action
-        → problems → [工具反思] in evolution-log
-                         |
-                    Agent fixes immediately
-                         or
-                    Heartbeat reviews systematically
-                         |
-                    >= 3 similar reflections = systemic issue, highest priority
+Need discovered → Read methodology → Write tools.py → Next message: auto-registered
+    ↓                                                          ↓
+    ↓                                                    Works fine → no action
+    ↓                                                    Problems → [工具反思]
+    ↓                                                          ↓
+    ↓                                              Fix immediately or heartbeat reviews
+    ↓                                              ≥3 similar → systemic, highest priority
+    ↓                                                          ↓
+    └──────────────────── evolution loop ───────────────────────┘
 ```
-
----
-
-## RSS Learning Pipeline
-
-A three-stage funnel that converts the internet into compressed knowledge:
-
-| Stage | Model | Purpose | Cost |
-|-------|-------|---------|------|
-| **Fetch** | Python only | Pull 97 RSS sources, deduplicate | Zero LLM cost |
-| **Filter** | Sonnet | Select articles worth deep reading | ~1 API call |
-| **Learn** | Opus | Read full articles, update skills/worldview | Varies |
-
-The filter is strict: methodology papers and architecture analyses over news, product launches, and weekly roundups. Quality over quantity.
-
----
-
-## Included Example: A-Stock Investment Agent
-
-`a-stock-agent/` demonstrates a complete skill with rank=3:
-
-- **G1 Market Context**: Decode the policy-capital-sentiment-cycle state of China's A-share market
-- **G2 Signal Synthesis**: Cross-validate multiple data dimensions into actionable signals
-- **G3 Cognitive Gatekeeping** (soul generator): Counter emotional market narratives, maintain independent judgment
-
-Remove G3 and it degrades to a generic stock screener — it can read data but can't resist the crowd.
 
 ---
 
 ## Quick Start
 
-```bash
-# Clone
-git clone https://github.com/anthropics/claw.git  # adjust URL
-cd claw
+### Prerequisites
 
-# Install dependencies
+- Python 3.11+
+- [Claude Agent SDK](https://github.com/anthropics/claude-agent-sdk) >= 0.1.44
+- Claude Max/Team subscription or API key
+- Telegram Bot Token (from [@BotFather](https://t.me/BotFather))
+
+### Setup
+
+```bash
+git clone https://github.com/Marvinngg/claw.git
+cd claw
 pip install -r requirements.txt
 
-# Configure
 cp .env.example .env
 # Edit .env: add your Telegram bot token
 
-# Authenticate Claude
-claude login
+claude login    # authenticate Claude
 
-# Start
-python3 bot.py
-
-# In Telegram, send /whoami to get your user ID
-# Add it to .env as TELEGRAM_OWNER_ID, restart bot
+python3 bot.py  # start
 ```
+
+In Telegram, send `/start` to your bot. Send `/whoami` to get your user ID, then add it to `.env` as `TELEGRAM_OWNER_ID` and restart.
 
 ### Commands
 
 | Command | What it does |
 |---------|-------------|
-| (any message) | Conversation with Claw (opus) |
-| `/heartbeat` | Run full heartbeat (diagnosis + maintenance + RSS) |
-| `/dry` | Phase 1 only (read-only diagnosis) |
+| *(any message)* | Conversation with Claw (opus) |
+| `/heartbeat` | Full heartbeat: diagnosis + maintenance + RSS learning |
+| `/dry` | Phase 1 diagnosis only (read-only) |
 | `/feeds` | RSS learning only |
 | `/status` | System status |
 | `/reset` | Reset conversation |
 
----
+### Creating Skills
 
-## Creating New Skills
+Tell Claw: *"Create a skill for [domain]"*
 
-Tell Claw: *"Create a skill for [domain]"* — this triggers the meta-agent, which:
-
-1. Collects domain behaviors (>=10)
+The meta-agent activates and:
+1. Collects domain behaviors (≥10)
 2. Discovers independent dimensions
 3. Reduces rank — finds irreducible generators
 4. Validates: can generators reconstruct all behaviors?
-5. Evaluates tool needs (read methodology first)
-6. Outputs: SKILL.md + evolution-log.md + references/ + tools.py (optional)
+5. Evaluates tool needs (reads methodology first)
+6. Outputs: `SKILL.md` + `evolution-log.md` + `references/` + `tools.py` (if needed)
 
 ---
 
@@ -222,43 +167,52 @@ Tell Claw: *"Create a skill for [domain]"* — this triggers the meta-agent, whi
 
 ```
 claw/
-├── CLAUDE.md                 Soul: identity, principles, tool capability pointer
-├── bot.py                    Telegram bot + auto heartbeat scheduler
-├── heartbeat.py              Heartbeat engine (Phase 1 + Phase 2 + RSS)
+├── CLAUDE.md                 Soul: identity, principles, tool capability
+├── bot.py                    Telegram bot + heartbeat scheduler
+├── heartbeat.py              Heartbeat engine
 ├── heartbeat.md              Phase 1 diagnostic checklist
-├── feed_fetcher.py           RSS fetcher (pure Python, zero LLM)
-├── feeds.json                RSS source configuration (97 feeds)
-├── tool_loader.py            Dynamic skill tool scanner + MCP registrar
+├── feed_fetcher.py           RSS fetcher (pure Python)
+├── feeds.json                97 RSS sources
+├── tool_loader.py            Scans skills for tools, registers as MCP
 ├── worldview.md              Cross-domain insight buffer
+│
 ├── .claude/skills/
-│   ├── meta-agent/           The agent that builds agents
+│   ├── meta-agent/           The skill that builds skills
 │   │   ├── SKILL.md          Rank reduction methodology
 │   │   └── references/
-│   │       ├── tool-methodology.md    7 tool design principles
-│   │       ├── tool-template.py       tools.py coding skeleton
-│   │       └── tool-spec-template.md  Tool requirements template
-│   └── a-stock-agent/        Example: A-share investment skill
-│       ├── SKILL.md          Rank=3 cognitive wiring diagram
-│       ├── tools.py          Market data tools (optional)
-│       └── evolution-log.md  Reflection buffer
+│   │       ├── tool-methodology.md     7 tool design principles
+│   │       ├── tool-template.py        tools.py skeleton
+│   │       └── tool-spec-template.md   Tool requirements template
+│   │
+│   └── a-stock-agent/        Example: A-share investment (rank=3)
+│       ├── SKILL.md           G1 Context × G2 Signal × G3 Gatekeeping
+│       ├── tools.py           Market data tools
+│       └── evolution-log.md   Reflection buffer
+│
 ├── .env.example              Configuration template
-└── requirements.txt          Python dependencies
+└── requirements.txt          Dependencies
+```
+
+### Dual Memory
+
+```
+Cognitive Memory (claw/)                 Collaborative Memory (~/.claude/.../memory/)
+  SKILL.md — how to think                 User preferences
+  tools.py — what tools to use            Behavioral corrections
+  worldview.md — cross-domain insights    Project context
+  evolution-log.md — reflection buffer    CC auto memory manages
+
+  Heartbeat maintains                     AI judges autonomously
+
+  Delete → knowledge degrades             Delete → collaboration degrades
+  Derivable from code → don't store
 ```
 
 ---
 
-## Design Document
+## Deep Dive
 
-For the complete technical architecture — context injection mechanisms, CAS parameters, session management, model allocation, and all three tool strategy options (MCP pre-registration / Subagent on-demand / CLI-first) — see [`claw运行机制-03.17.md`](claw运行机制-03.17.md).
-
----
-
-## Requirements
-
-- Python 3.11+
-- [Claude Agent SDK](https://github.com/anthropics/claude-agent-sdk) >= 0.1.44
-- Claude Max/Team subscription or API key
-- Telegram Bot Token (from [@BotFather](https://t.me/BotFather))
+Full architecture document: context injection, CAS parameters, session management, model allocation, and three tool strategies (SDK MCP / Subagent on-demand / CLI-first) — see [`claw运行机制-03.17.md`](claw运行机制-03.17.md).
 
 ---
 
